@@ -190,10 +190,23 @@ else:
         def once(self, start, end):
             import array
 
-            # prepare the data arrays - single shot
-            narrays = [np.array(x.lines[0].array) for x in self.datas]
-            # Execute
-            output = self._tafunc(*narrays, **self.p._getkwargs())
+            if 'prices' in self._tabstract.info['input_names'].keys():
+                # TA-Lib function requires other inputs besides close
+                output = []
+                for x in self.datas:
+                    x_inputs = [
+                        np.array(getattr(x, field).array)
+                        for field in self._tabstract.info['input_names']['prices']
+                    ]
+                    if len(self.datas) == 1:
+                        output = self._tafunc(*x_inputs, **self.p._getkwargs())
+                    else:
+                        output.append(self._tafunc(*x_inputs, **self.p._getkwargs()))
+            else:
+                # prepare the data arrays - single shot, trivial case
+                narrays = [np.array(x.lines[0].array) for x in self.datas]
+                # Execute
+                output = self._tafunc(*narrays, **self.p._getkwargs())
 
             fsize = self.size()
             lsize = fsize - self._iscandle
@@ -212,9 +225,25 @@ else:
         def next(self):
             # prepare the data arrays - single shot
             size = self._lookback or len(self)
-            narrays = [np.array(x.lines[0].get(size=size)) for x in self.datas]
 
-            out = self._tafunc(*narrays, **self.p._getkwargs())
+            if 'prices' in self._tabstract.info['input_names'].keys():
+                # TA-Lib function requires other inputs besides close
+                out = []
+                for x in self.datas:
+                    x_inputs = [
+                        np.array(getattr(x, field).get(size=size))
+                        for field in self._tabstract.info['input_names']['prices']
+                    ]
+                    output[idx] = self._tafunc(*x_inputs, **self.p._getkwargs())
+                    if len(self.datas) == 1:
+                        out = self._tafunc(*narrays, **self.p._getkwargs())
+                    else:
+                        out.append(self._tafunc(*narrays, **self.p._getkwargs()))
+            else:
+                # Trivial case
+                narrays = [np.array(x.lines[0].get(size=size)) for x in self.datas]
+                out = self._tafunc(*narrays, **self.p._getkwargs())
+
 
             fsize = self.size()
             lsize = fsize - self._iscandle

@@ -238,11 +238,10 @@ else:
                         np.array(getattr(x, field).get(size=size))
                         for field in self._tabstract.info['input_names']['prices']
                     ]
-                    output[idx] = self._tafunc(*x_inputs, **self.p._getkwargs())
                     if len(self.datas) == 1:
-                        out = self._tafunc(*narrays, **self.p._getkwargs())
+                        out = self._tafunc(*x_inputs, **self.p._getkwargs())
                     else:
-                        out.append(self._tafunc(*narrays, **self.p._getkwargs()))
+                        out.append(self._tafunc(*x_inputs, **self.p._getkwargs()))
             else:
                 # Trivial case
                 narrays = [np.array(x.lines[0].get(size=size)) for x in self.datas]

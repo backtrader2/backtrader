@@ -202,6 +202,7 @@ else:
                         output = self._tafunc(*x_inputs, **self.p._getkwargs())
                     else:
                         output.append(self._tafunc(*x_inputs, **self.p._getkwargs()))
+                narrays = None
             else:
                 # prepare the data arrays - single shot, trivial case
                 narrays = [np.array(x.lines[0].array) for x in self.datas]
@@ -214,10 +215,13 @@ else:
                 self.lines[0].array = array.array(str('d'), output)
 
                 if fsize > lsize:  # candle is present
-                    candleref = narrays[self.CANDLEREF] * self.CANDLEOVER
+                    # set up candleref to display candle on close price (if output is a candle)
+                    candleref = [np.array(x.lines[0].array) * self.CANDLEOVER for x in self.datas]
                     output2 = candleref * (output / 100.0)
-                    self.lines[1].array = array.array(str('d'), output2)
-
+                    if len(self.datas) == 1:
+                        self.lines[1].array = array.array(str('d'), output2[0])
+                    else:
+                        self.lines[1].array = array.array(str('d'), output2)
             else:
                 for i, o in enumerate(output):
                     self.lines[i].array = array.array(str('d'), o)

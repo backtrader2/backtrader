@@ -21,12 +21,31 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
-import backtrader as bt
+import testcommon
 
-from .import vortex as vortex
-from .import keltner as keltner
+import backtrader.indicators as btind
 
-for name in vortex.__all__:
-    setattr(bt.indicators, name, getattr(vortex, name))
-for name in keltner.__all__:
-    setattr(bt.indicators, name, getattr(keltner, name))
+chkdatas = 1
+chkvals = [
+    ['4118.043000', '3646.323000', '3600.960000'],
+    ['4145.398000', '3675.322000', '3645.394000'],
+    ['4090.688000', '3617.324000', '3556.526000'],
+]
+
+chkmin = 10
+chkind = btind.KeltnerChannel
+
+
+def test_run(main=False):
+    datas = [testcommon.getdata(i) for i in range(chkdatas)]
+    testcommon.runtest(datas,
+                       testcommon.TestStrategy,
+                       main=main,
+                       plot=main,
+                       chkind=chkind,
+                       chkmin=chkmin,
+                       chkvals=chkvals)
+
+
+if __name__ == '__main__':
+    test_run(main=True)

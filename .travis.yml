@@ -16,8 +16,8 @@ matrix:
 install:
   - pip install pandas
   - pip install git+https://github.com/blampe/IbPy.git
-  - pip install scipy
-  - pip install statsmodels
+#  - pip install scipy
+#  - pip install statsmodels
 # - pip install your_package
 
 

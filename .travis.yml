@@ -10,7 +10,11 @@ matrix:
   allow_failures:
     python: "3.8-dev"
     python: "nightly"
-
+    
+    
+# Needed in travis to allow install of scipy package
+before_install:
+  - sudo apt-get -y install libblas-dev  liblapack-dev
 
 # command to install dependencies
 install:

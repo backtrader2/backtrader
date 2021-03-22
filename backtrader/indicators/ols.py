@@ -101,6 +101,7 @@ class OLS_BetaN(PeriodN):
         r_beta = smapi.OLS(y,x).fit()
         self.lines.beta[0] = r_beta.params['x']
 
+
 class CointN(PeriodN):
     '''
     Calculates the score (coint_t) and pvalue for a given ``period`` for the

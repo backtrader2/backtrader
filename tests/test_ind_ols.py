@@ -38,11 +38,11 @@ chkvals = [
 
 chkmin = 10
 chkind = btind.OLS_BetaN
-#chkargs = dict()
 
 DATAFEED = bt.feeds.BacktraderCSVData
 FROMDATE = datetime.datetime(2003, 1, 1)
 TODATE = datetime.datetime(2005, 12, 31)
+
 
 def getdata(datafile, fromdate=FROMDATE, todate=TODATE):
     modpath = os.path.dirname(os.path.abspath(__file__))
@@ -55,12 +55,14 @@ def getdata(datafile, fromdate=FROMDATE, todate=TODATE):
 
     return data
 
+
 class TS2(testcommon.TestStrategy):
     def __init__(self):
         ind0 = self.data0.close
         ind1 = self.data1.close
         self.p.inddata = [ind0, ind1]
-        self.ind = btind.OLS_BetaN(*self.p.inddata )
+        self.ind = btind.OLS_BetaN(*self.p.inddata)
+
 
 def test_run(main=False):
     datas = [getdata(i) for i in datafiles]

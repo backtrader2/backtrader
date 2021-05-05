@@ -274,6 +274,7 @@ class IBBroker(with_metaclass(MetaIBBroker, BrokerBase)):
         self.orderbyid = dict()  # orders by order id
         self.executions = dict()  # notified executions
         self.ordstatus = collections.defaultdict(dict)
+        self.positions = collections.defaultdict(Position)
         self.notifs = queue.Queue()  # holds orders which are notified
         self.tonotify = collections.deque()  # hold oids to be notified
 

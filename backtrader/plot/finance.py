@@ -48,6 +48,7 @@ class CandlestickPlotHandler(object):
                  label='_nolegend',
                  fillup=True,
                  filldown=True,
+                 trend=False,
                  **kwargs):
 
         # Manager up/down bar colors
@@ -86,6 +87,7 @@ class CandlestickPlotHandler(object):
             width, tickwidth, edgeadjust,
             label=label,
             fillup=fillup, filldown=filldown,
+            trend=trend,
             **kwargs)
 
         # add collections to the axis and return them
@@ -129,6 +131,7 @@ class CandlestickPlotHandler(object):
                       label='_nolegend',
                       scaling=1.0, bot=0,
                       fillup=True, filldown=True,
+                      trend=False,
                       **kwargs):
 
         # Prepack different zips of the series values
@@ -136,16 +139,46 @@ class CandlestickPlotHandler(object):
         xoc = lambda: zip(xs, opens, closes)  # NOQA: E731
         iohlc = lambda: zip(xs, opens, highs, lows, closes)  # NOQA: E731
 
-        colorup = self.colorup if fillup else 'None'
-        colordown = self.colordown if filldown else 'None'
-        colord = {True: colorup, False: colordown}
-        colors = [colord[o < c] for o, c in oc()]
-
         edgecolord = {True: self.edgeup, False: self.edgedown}
-        edgecolors = [edgecolord[o < c] for o, c in oc()]
-
         tickcolord = {True: self.tickup, False: self.tickdown}
-        tickcolors = [tickcolord[o < c] for o, c in oc()]
+        
+        if trend:
+            # Prepack different zips of the series values
+            cc = lambda: zip(closes[-1:]+closes[:-1], closes)
+
+            # Select color based on previous close price
+            colord = {True: self.colorup, False: self.colordown}
+            colors = [colord[c1 < c2] for c1, c2 in cc()]
+            colors[0] = (0,0,0,0.25) # First color can't be determined because
+                                     # we don't know the previous price. Make
+                                     # it gray.
+
+            # Select fill based on current period
+            fillsb = [o < c for o, c, in oc()]
+            for x in range(len(colors)):
+                if fillsb[x] == True:
+                    colors[x] = 'None'
+
+            # Edge colors should follow bar color
+            edgecolors = [edgecolord[c1 < c2] for c1, c2 in cc()]
+            edgecolors[0] = (0,0,0,1) # First color can't be determined because
+                                      # we don't know the previous price. Make
+                                      # it gray.
+
+            # Tick colors should follow bar color
+            tickcolors = [tickcolord[c1 < c2] for c1, c2 in cc()]
+            tickcolors[0] = (0,0,0,1)  # First color can't be determined because
+                                       # we don't know the previous price. Make
+                                       # it gray.
+        else:
+            colorup = self.colorup if fillup else 'None'
+            colordown = self.colordown if filldown else 'None'
+            colord = {True: colorup, False: colordown}        
+            colors = [colord[o < c] for o, c in oc()]
+
+            edgecolors = [edgecolord[o < c] for o, c in oc()]
+
+            tickcolors = [tickcolord[o < c] for o, c in oc()]
 
         delta = width / 2 - edgeadjust
 
@@ -219,6 +252,7 @@ def plot_candlestick(ax,
                      label='_nolegend',
                      fillup=True,
                      filldown=True,
+                     trend=False,
                      **kwargs):
 
     chandler = CandlestickPlotHandler(
@@ -232,6 +266,7 @@ def plot_candlestick(ax,
         label,
         fillup,
         filldown,
+        trend,
         **kwargs)
 
     # Return the collections. the barcol goes first because

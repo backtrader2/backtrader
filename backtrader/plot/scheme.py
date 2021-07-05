@@ -125,6 +125,9 @@ class PlotScheme(object):
         # Opacity for the filled candlesticks (1.0 opaque - 0.0 transparent)
         self.baralpha = 1.0
 
+        # Whether to implement a candlestick 'trend' plot or not
+        self.trend = False
+
         # Alpha blending for fill areas between lines (_fill_gt and _fill_lt)
         self.fillalpha = 0.20
 
